@@ -225,10 +225,18 @@
 
     // menicka_view.html posílá window.parent.postMessage('jidlogic-ready', '*')
     // hned po načtení — fade out wrapper overlay.
+    // Voting flow: appka uvnitř iframu po stisku „Zavřít" / „Smazat" pošle
+    // 'voting-exit'. history.replaceState uvnitř iframu mění jen URL toho
+    // iframu (origin googleusercontent), nikoli wrapper URL na github.io.
+    // Bez tohoto handleru by reload nebo PWA cold start znovu vstoupil do
+    // voting view dle stale `?vote=ID`. Tady stripneme query z wrapper URL.
     window.addEventListener('message', function(e) {
       var data = e.data;
       var msg = (data && data.type) ? data.type : data;
       if (msg === 'jidlogic-ready' || msg === 'menicka-ready') fadeOut();
+      if (msg === 'voting-exit') {
+        try { history.replaceState({}, '', window.location.pathname); } catch (err) {}
+      }
     });
 
     // Fallback: pokud handshake nedorazí do 5 s (typicky GAS load 1-3 s,
