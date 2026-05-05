@@ -156,10 +156,21 @@
        silently failne bez tohoto atributu. -->
   <iframe
     id="app-iframe"
-    src="https://script.google.com/a/macros/blogic.cz/s/AKfycbw4_Y3RRfN4KXfQTeL2eS_fpyZmzpWtHBDQrCm8YAiVfycWi6_xKvVPke4o2Ipoi9vt8Q/exec"
+    src=""
     title="Luncher PE"
     allow="geolocation"
   ></iframe>
+  <script>
+    // Build iframe src — forwarduje ?vote=ID (a další query params) do GAS appky.
+    // Bez tohoto by se voting URL `?vote=ABC` ze sdíleného linku ztratilo na
+    // wrapper úrovni (window.location.search má ?vote, ale iframe by ho neviděl).
+    (function() {
+      var GAS_URL = 'https://script.google.com/a/macros/blogic.cz/s/AKfycbw4_Y3RRfN4KXfQTeL2eS_fpyZmzpWtHBDQrCm8YAiVfycWi6_xKvVPke4o2Ipoi9vt8Q/exec';
+      var qs = window.location.search || '';
+      var iframe = document.getElementById('app-iframe');
+      if (iframe) iframe.src = GAS_URL + qs;
+    })();
+  </script>
 
   <div class="wrapper-loading" id="wrapper-loading">
     <div class="wrapper-loading-icon" aria-hidden="true">
