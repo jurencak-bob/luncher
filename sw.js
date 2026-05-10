@@ -5,7 +5,7 @@
 //
 // Bump CACHE_NAME při změně shell content (index.html, manifest, ikony).
 // Activate handler smaže staré cache klíče → user dostane fresh shell.
-var CACHE_NAME = 'luncher-shell-v3';
+var CACHE_NAME = 'luncher-shell-v4';
 var CORE_SHELL = [
   './',
   'index.html',
