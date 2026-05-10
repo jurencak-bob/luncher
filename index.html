@@ -121,6 +121,35 @@
       .wrapper-progress-bar { animation: none; width: 60%; }
     }
 
+    /* Voting variant — wrapper loader pro `?vote=ID` URL. Skryje brand
+       plate-wobble + progress bar (= „Otevírám Luncher PE" intro animace
+       neodpovídá kontextu „načítám sdílené hlasování"). Místo toho cleaner
+       spinner + „Načítám hlasování…" text — vizuálně shodný s GAS voting
+       loaderem (luncher_view.html `.voting-loading`), takže přechod
+       wrapper→iframe je pro user neviditelný (vypadá jako jeden loader). */
+    .wrapper-loading.is-voting .wrapper-loading-icon,
+    .wrapper-loading.is-voting .wrapper-progress { display: none; }
+    .wrapper-loading.is-voting .wrapper-loading-text { display: none; }
+    .wrapper-loading.is-voting .voting-loader-inline { display: flex; }
+    .voting-loader-inline {
+      display: none; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .voting-loader-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(107, 45, 139, 0.15);
+      border-top-color: #6B2D8B;
+      border-radius: 50%;
+      animation: voting-loader-spin 0.8s linear infinite;
+    }
+    @keyframes voting-loader-spin { to { transform: rotate(360deg); } }
+    .voting-loader-text {
+      font-size: 0.95rem; color: #6E6E80;
+      letter-spacing: 0.02em;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .voting-loader-spinner { animation: none; }
+    }
+
     /* Fallback panel — zobrazí se po timeoutu, pokud iframe nenajede.
        Reformulace: nečekávané dlouhé načítání + možná příčina (cookies
        v iframu blokované Tracking Protection) + escape hatch. */
@@ -196,6 +225,14 @@
     <div class="wrapper-progress" aria-hidden="true">
       <div class="wrapper-progress-bar"></div>
     </div>
+    <!-- Voting variant — viditelný jen když body má .is-voting (set z JS
+         pokud URL má ?vote=ID). Nahrazuje plate-wobble + brand text + progress
+         za simple spinner + „Načítám hlasování…", takže přechod wrapper→iframe
+         vypadá jako jeden continuous loader. -->
+    <div class="voting-loader-inline" aria-hidden="true">
+      <div class="voting-loader-spinner"></div>
+      <div class="voting-loader-text">Načítám hlasování…</div>
+    </div>
     <div class="fallback-panel" id="fallback-panel">
       <h2>Přijde ti, že se to načítá dlouho?</h2>
       <p>Většinou stačí počkat ještě sekundu nebo dvě. Nebo devět.</p>
@@ -217,6 +254,14 @@
     var fallbackEl = document.getElementById('fallback-panel');
     var iframeEl = document.getElementById('app-iframe');
     var faded = false;
+
+    // Voting variant — když URL má ?vote=ID, prepneme loader na voting-style
+    // (spinner + „Načítám hlasování…"), takže user nevidí brand „Otevírám
+    // Luncher PE" nejdřív + voting loader pak. Místo toho vypadá jako jeden
+    // continuous loader (wrapper i GAS iframe pak ukazují stejný spinner).
+    if (/[?&]vote=/.test(window.location.search)) {
+      loadingEl.classList.add('is-voting');
+    }
 
     function fadeOut() {
       if (faded) return;
