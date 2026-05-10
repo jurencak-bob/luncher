@@ -149,16 +149,18 @@
 </head>
 <body>
   <!-- GAS meníčka v iframe — vlastní deploy AKfycbw4…
-       allow="geolocation": iframe musí mít explicitní permission delegation,
-       jinak Chromium 90+ striktně blokuje navigator.geolocation v cross-origin
-       iframu (parent github.io, child script.google.com). I když user povolil
-       polohu pro stránku v browser nastavení, getCurrentPosition uvnitř iframu
-       silently failne bez tohoto atributu. -->
+       allow= permission delegation pro APIs, které Chromium 90+ blokuje
+       v cross-origin iframu (parent github.io, child script.google.com):
+         - geolocation: getCurrentPosition pro filtr restaurací podle vzdálenosti
+         - web-share: navigator.share pro „Sdílet" voting URL přes native picker
+         - clipboard-write: navigator.clipboard.writeText pro „Kopírovat" voting URL
+       Bez explicitní allow- listy tyhle API silently failnou v iframu i kdyby
+       user povolil přístup pro stránku v prohlížeči. -->
   <iframe
     id="app-iframe"
     src=""
     title="Luncher PE"
-    allow="geolocation"
+    allow="geolocation; web-share; clipboard-write"
   ></iframe>
   <script>
     // Build iframe src — forwarduje ?vote=ID (a další query params) do GAS appky.
