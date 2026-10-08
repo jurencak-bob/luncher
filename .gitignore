@@ -1,0 +1,29 @@
+# --- Citlivé (NIKDY do gitu) ---
+.env
+.env.local
+credentials.json
+token.json
+*.key
+*.pem
+
+# --- Osobní / GDPR data ---
+*.pdf
+report_*.csv
+*_vykazy_*.csv
+*_raw_data*.csv
+
+# --- Prostředí a balast ---
+.venv/
+venv/
+node_modules/
+__pycache__/
+*.pyc
+*.db
+*.db-journal
+.DS_Store
+
+# --- Claude Code lokální ---
+.claude/
+
+# --- Lokální prototypy (nepublikovat na Pages) ---
+prototypes/
