@@ -424,7 +424,7 @@
           quip: 'Šťastný nový rok!',
           line: 'Otevírám si šáňo a tobě Luncher PE…',
           decor: { n: 24, twinkle: true, dur: [1.4, 3] },
-          // Ohňostroj + letopočet roku, který začíná (30.-31.12. už ten příští)
+          // Ohňostroj + letopočet nadcházejícího Nového roku: v lednu letošní, jinak příští
           svg: '<rect width="64" height="64" rx="16" fill="#1E1838"/>' +
             '<g stroke-width="2" stroke-linecap="round">' +
             '<path d="M32 9v5M32 30v-5M21 19.5h5M43 19.5h-5M24.5 12l3 3M39.5 27l-3-3M39.5 12l-3 3M24.5 27l3-3" stroke="#E8C35A"/>' +
@@ -433,7 +433,7 @@
             '<circle cx="32" cy="19.5" r="2.4" fill="#F5D77A"/>' +
             '<text x="32" y="53" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" ' +
             'font-size="15" font-weight="800" fill="#F5D77A">' + (function () {
-              var d = new Date(); return d.getMonth() === 11 ? d.getFullYear() + 1 : d.getFullYear();
+              var d = new Date(); return d.getMonth() === 0 ? d.getFullYear() : d.getFullYear() + 1;
             })() + '</text>'
         },
         velikonoce: {
