@@ -330,22 +330,26 @@
       }
     });
 
-    // Fallback: pokud handshake nedorazí do 4 s (typicky GAS load 1-3 s),
-    // ukáže panel s vysvětlením + CTA.
-    setTimeout(function() {
-      if (!faded) fallbackEl.classList.add('show');
-    }, 4000);
-
     // Luncher PE GAS appka handshake neposílá, takže overlay musí zmizet
     // i bez něj. iframe 'load' pálí až po načtení obsahu (vč. vnořeného
-    // GAS sandbox iframu) → krátká rezerva a fade-out. Pojistka 10 s pro
-    // případ, že load nedorazí. Bez toho overlay visel napořád nad funkční
-    // appkou (regrese z aaa252f, kde se force fade-out smazal).
+    // GAS sandbox iframu) → krátká rezerva a fade-out. Bez toho overlay
+    // visel napořád nad funkční appkou (regrese z aaa252f).
+    var iframeLoaded = false;
     iframeEl.addEventListener('load', function() {
       if (iframeEl.src.indexOf('script.google.com') === -1) return;
-      setTimeout(fadeOut, 800);
+      iframeLoaded = true;
+      fallbackEl.classList.remove('show');
+      setTimeout(fadeOut, 300);
     });
-    setTimeout(fadeOut, 10000);
+
+    // Fallback panel: GAS na mobilu běžně načítá 4-6 s, proto až po 8 s
+    // a jen pokud iframe ještě nic nenačetl (jinak panel problikne těsně
+    // před fade-outem). Pojistka 20 s pro případ, že load nedorazí vůbec;
+    // do té doby má user čas panel přečíst.
+    setTimeout(function() {
+      if (!faded && !iframeLoaded) fallbackEl.classList.add('show');
+    }, 8000);
+    setTimeout(fadeOut, 20000);
 
     // Reload button: user může zkusit znovu (např. po přihlášení v jiném tabu).
     var reloadBtn = document.getElementById('fallback-reload');
