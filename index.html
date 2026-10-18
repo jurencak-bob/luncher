@@ -151,33 +151,49 @@
     }
 
     /* Sváteční motivy loaderu — JS nastaví data-season na .wrapper-loading
-       podle data v zařízení (halloween | vanoce | novyrok | velikonoce).
-       Mění se jen pozadí, barvy, ikona, text a dekor; loader je vidět
-       1-3 s, takže všechno musí být vidět hned od prvního snímku.
+       podle data v zařízení a barvy motivu předá přes CSS proměnné --s-*
+       (definice motivů jsou v JS, objekt THEMES). Mění se jen pozadí, barvy,
+       ikona, text a dekor; loader je vidět 1-3 s, takže všechno musí být
+       vidět hned od prvního snímku.
        Náhled: index.html#season=halloween (hash se do GAS nepřeposílá),
        s &hold loader nezmizí, dokud na něj uživatel neťukne. */
     .season-decor { display: none; position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .wrapper-loading[data-season] { background: var(--s-bg); }
     .wrapper-loading[data-season] .season-decor { display: block; }
     .wrapper-loading[data-season] .wrapper-loading-icon,
     .wrapper-loading[data-season] .wrapper-loading-text,
     .wrapper-loading[data-season] .wrapper-progress,
     .wrapper-loading[data-season] .fallback-panel { position: relative; }
-    .wrapper-loading[data-season] .wrapper-loading-text { text-align: center; padding: 0 24px; }
+    .wrapper-loading[data-season] .wrapper-loading-icon { box-shadow: 0 8px 28px var(--s-glow); }
+    .wrapper-loading[data-season] .wrapper-loading-text { text-align: center; padding: 0 24px; color: var(--s-text); }
+    .wrapper-loading[data-season] .wrapper-progress { background: var(--s-track); }
+    .wrapper-loading[data-season] .wrapper-progress-bar { background: var(--s-bar); }
+    /* Apríl: ikona vzhůru nohama */
+    .wrapper-loading.season-flip .wrapper-loading-icon svg { transform: rotate(180deg); }
     .season-quip {
       position: relative; margin: -8px 24px 6px; text-align: center;
-      font-size: 1.15rem; font-weight: 700; color: inherit;
+      font-size: 1.15rem; font-weight: 700; color: var(--s-quip);
     }
-    .wrapper-loading[data-season="halloween"] .season-quip { color: #F27B1C; }
-    .wrapper-loading[data-season="vanoce"] .season-quip { color: #FFFFFF; }
-    .wrapper-loading[data-season="novyrok"] .season-quip { color: #F5D77A; }
-    .wrapper-loading[data-season="velikonoce"] .season-quip { color: #3E6B22; }
     .season-decor i {
-      position: absolute; top: -24px; font-style: normal; line-height: 1;
-      animation: season-fall linear infinite;
+      position: absolute; font-style: normal; line-height: 1;
+      color: var(--s-decor, inherit); opacity: .9;
+      animation-timing-function: linear; animation-iteration-count: infinite;
+    }
+    .season-decor.d-fall i { top: -24px; animation-name: season-fall; }
+    .season-decor.d-rise i { bottom: -40px; animation-name: season-rise; }
+    .season-decor.d-fly i  { animation-name: season-fly; animation-timing-function: ease-in-out; }
+    .season-decor.d-twinkle i {
+      width: 4px; height: 4px; border-radius: 50%; background: var(--s-decor);
+      box-shadow: 0 0 8px 2px var(--s-decor);
+      animation-name: season-twinkle; animation-timing-function: ease-in-out;
     }
     @keyframes season-fall {
       from { transform: translate3d(0, 0, 0) rotate(0deg); }
-      to   { transform: translate3d(var(--drift, 20px), 110vh, 0) rotate(360deg); }
+      to   { transform: translate3d(var(--drift, 20px), 110vh, 0) rotate(var(--spin, 360deg)); }
+    }
+    @keyframes season-rise {
+      from { transform: translate3d(0, 0, 0); }
+      to   { transform: translate3d(var(--drift, 20px), -115vh, 0); }
     }
     @keyframes season-twinkle {
       0%, 100% { opacity: .15; transform: scale(.6); }
@@ -188,47 +204,6 @@
       50%  { transform: translate3d(50vw, -6vh, 0); }
       to   { transform: translate3d(115vw, 2vh, 0); }
     }
-
-    /* Halloween: noc s měsícem a netopýry */
-    .wrapper-loading[data-season="halloween"] {
-      background: radial-gradient(circle at 82% 14%, #FFF1C2 0 34px, rgba(255,214,120,.35) 36px, transparent 120px), #1B1026;
-    }
-    .wrapper-loading[data-season="halloween"] .wrapper-loading-text { color: #F3D9B1; }
-    .wrapper-loading[data-season="halloween"] .wrapper-loading-icon { box-shadow: 0 8px 28px rgba(242,123,28,.45); }
-    .wrapper-loading[data-season="halloween"] .wrapper-progress { background: rgba(242,123,28,.2); }
-    .wrapper-loading[data-season="halloween"] .wrapper-progress-bar { background: #F27B1C; }
-    .wrapper-loading[data-season="halloween"] .season-decor i {
-      top: auto; font-size: 22px; animation-name: season-fly; animation-timing-function: ease-in-out;
-    }
-
-    /* Vánoce: noční modrá a padající sníh */
-    .wrapper-loading[data-season="vanoce"] { background: linear-gradient(#0B1626, #16294A); }
-    .wrapper-loading[data-season="vanoce"] .wrapper-loading-text { color: #DDE8F5; }
-    .wrapper-loading[data-season="vanoce"] .wrapper-loading-icon { box-shadow: 0 8px 28px rgba(201,164,76,.4); }
-    .wrapper-loading[data-season="vanoce"] .wrapper-progress { background: rgba(255,255,255,.15); }
-    .wrapper-loading[data-season="vanoce"] .wrapper-progress-bar { background: #D3263A; }
-    .wrapper-loading[data-season="vanoce"] .season-decor i { color: #fff; opacity: .85; }
-
-    /* Nový rok: zlatá na tmavé, třpytky */
-    .wrapper-loading[data-season="novyrok"] { background: radial-gradient(circle at 50% 40%, #2A2050, #120E22 70%); }
-    .wrapper-loading[data-season="novyrok"] .wrapper-loading-text { color: #F2E3B3; }
-    .wrapper-loading[data-season="novyrok"] .wrapper-loading-icon { box-shadow: 0 8px 28px rgba(232,195,90,.45); }
-    .wrapper-loading[data-season="novyrok"] .wrapper-progress { background: rgba(232,195,90,.2); }
-    .wrapper-loading[data-season="novyrok"] .wrapper-progress-bar { background: #E8C35A; }
-    .wrapper-loading[data-season="novyrok"] .season-decor i {
-      width: 4px; height: 4px; border-radius: 50%; background: #F5D77A;
-      box-shadow: 0 0 8px 2px rgba(245,215,122,.6);
-      animation-name: season-twinkle; animation-timing-function: ease-in-out;
-    }
-
-    /* Velikonoce: jarní pastel, kytičky */
-    .wrapper-loading[data-season="velikonoce"] { background: linear-gradient(#F6FBEF, #E6F2D8); }
-    .wrapper-loading[data-season="velikonoce"] .wrapper-loading-text { color: #4F6B3A; }
-    .wrapper-loading[data-season="velikonoce"] .wrapper-loading-icon { box-shadow: 0 8px 24px rgba(124,179,66,.35); }
-    .wrapper-loading[data-season="velikonoce"] .wrapper-progress { background: rgba(124,179,66,.2); }
-    .wrapper-loading[data-season="velikonoce"] .wrapper-progress-bar { background: #7CB342; }
-    .wrapper-loading[data-season="velikonoce"] .season-decor i { font-size: 16px; opacity: .8; }
-
     @media (prefers-reduced-motion: reduce) {
       .season-decor { display: none !important; }
     }
@@ -392,38 +367,48 @@
     }
 
     // Sváteční motiv loaderu (ne pro voting variantu). Datum ze zařízení,
-    // server tu ještě není k dispozici. Termíny volnější než v Jídlogicu,
-    // loader je vidět jen chvilku. Náhled: #season=<id>, vypnout: #season=off,
+    // server tu ještě není k dispozici. Termíny podle Jídlogicu, jen s pár dny
+    // předstihu podle kalendáře (loader se otevírá i o víkendu).
+    // Náhled: #season=<id>, vypnout: #season=off,
     // #season=<id>&hold = loader zůstane, dokud na něj neťukneš (kontrola na mobilu).
     (function() {
       if (loadingEl.classList.contains('is-voting')) return;
+
+      // ─── Kalendář ───
+      function D(y, m, d) { return new Date(y, m - 1, d); }
+      function add(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+      function nth(y, m, wd, n) { var d = D(y, m, 1); while (d.getDay() !== wd) d = add(d, 1); return add(d, 7 * (n - 1)); }
+      function last(y, m, wd) { var d = D(y, m + 1, 0); while (d.getDay() !== wd) d = add(d, -1); return d; }
+      function easterSunday(y) {
+        var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,
+            f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
+            i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+            mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+        return new Date(y, mo - 1, da);
+      }
+      /** Okno [den - pre, den] */
+      function day(d, pre) { return [[add(d, -(pre || 0)), d]]; }
+
+      // ─── Ikony: vlastní SVG, nebo emoji / text na barevném čtverci ───
+      function tile(bg, emoji) {
+        return '<rect width="64" height="64" rx="16" fill="' + bg + '"/>' +
+          '<text x="32" y="34" text-anchor="middle" dominant-baseline="central" font-size="34">' + emoji + '</text>';
+      }
+      function tileText(bg, fg, txt, size) {
+        return '<rect width="64" height="64" rx="16" fill="' + bg + '"/>' +
+          '<text x="32" y="34" text-anchor="middle" dominant-baseline="central" fill="' + fg + '" ' +
+          'font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="' + (size || 26) + '" font-weight="800">' + txt + '</text>';
+      }
+
+      // c: [pozadí, text, vtip, průběh, dráha průběhu, záře ikony, barva dekoru]
+      // decor: typ (fall | rise | fly | twinkle), n kusů, chars, dur [s], size [px], top [%] pro fly
       var THEMES = {
-        halloween: {
-          quip: 'Bubák si dává oběd taky.',
-          line: 'Děsivě otevírám lebky i Luncher PE…',
-          decor: { n: 5, chars: ['🦇'], dur: [4, 7], top: [8, 40] },
-          svg: '<rect width="64" height="64" rx="16" fill="#2A1236"/>' +
-            '<path d="M32 15c0-4 2-6 5-7" stroke="#6E9A38" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
-            '<ellipse cx="22" cy="36" rx="12" ry="13" fill="#D9620F"/><ellipse cx="42" cy="36" rx="12" ry="13" fill="#D9620F"/>' +
-            '<ellipse cx="32" cy="36" rx="12" ry="14" fill="#F27B1C"/>' +
-            '<path d="M22 31l5-5 3 5zM42 31l-5-5-3 5z" fill="#FFD54A"/>' +
-            '<path d="M21 40q11 9 22 0l-3 1-2 3-3-2-3 2-3-2-3 2-2-3z" fill="#FFD54A"/>'
-        },
-        vanoce: {
-          quip: 'Cukroví počká, oběd ne.',
-          line: 'Purpura a Luncher PE na plotně voní…',
-          decor: { n: 18, chars: ['❄', '•', '•'], dur: [5, 10], size: [8, 16] },
-          svg: '<rect width="64" height="64" rx="16" fill="#123A2A"/>' +
-            '<path d="M32 12l-11 15h6l-9 12h7l-9 11h32l-9-11h7l-9-12h6z" fill="#1F8A4C"/>' +
-            '<rect x="29" y="50" width="6" height="5" rx="1" fill="#8A5A2B"/>' +
-            '<path d="M32 6l1.8 3.7 4 .6-2.9 2.8.7 4L32 15.2l-3.6 1.9.7-4-2.9-2.8 4-.6z" fill="#E8C35A"/>' +
-            '<circle cx="27" cy="31" r="2.2" fill="#D3263A"/><circle cx="37" cy="36" r="2.2" fill="#E8C35A"/>' +
-            '<circle cx="24" cy="44" r="2.2" fill="#2F64C8"/><circle cx="34" cy="46" r="2.2" fill="#D3263A"/><circle cx="42" cy="44" r="2.2" fill="#E8C35A"/>'
-        },
         novyrok: {
+          when: function(y) { return [[D(y - 1, 12, 30), D(y, 1, 5)], [D(y, 12, 30), D(y + 1, 1, 5)]]; },
           quip: 'Šťastný nový rok!',
           line: 'Otevírám si šáňo a tobě Luncher PE…',
-          decor: { n: 24, twinkle: true, dur: [1.4, 3] },
+          c: ['radial-gradient(circle at 50% 40%, #2A2050, #120E22 70%)', '#F2E3B3', '#F5D77A', '#E8C35A', 'rgba(232,195,90,.2)', 'rgba(232,195,90,.45)', '#F5D77A'],
+          decor: { type: 'twinkle', n: 24, dur: [1.4, 3] },
           // Ohňostroj + letopočet nadcházejícího Nového roku: v lednu letošní, jinak příští
           svg: '<rect width="64" height="64" rx="16" fill="#1E1838"/>' +
             '<g stroke-width="2" stroke-linecap="round">' +
@@ -436,43 +421,254 @@
               var d = new Date(); return d.getMonth() === 0 ? d.getFullYear() : d.getFullYear() + 1;
             })() + '</text>'
         },
+        vanoce: {
+          when: function(y) { return [[D(y, 12, 14), D(y, 12, 26)]]; },
+          quip: 'Cukroví počká, oběd ne.',
+          line: 'Purpura a Luncher PE na plotně voní…',
+          c: ['linear-gradient(#0B1626, #16294A)', '#DDE8F5', '#FFFFFF', '#D3263A', 'rgba(255,255,255,.15)', 'rgba(201,164,76,.4)', '#FFFFFF'],
+          decor: { type: 'fall', n: 18, chars: ['❄', '•', '•'], dur: [5, 10], size: [8, 16] },
+          svg: '<rect width="64" height="64" rx="16" fill="#123A2A"/>' +
+            '<path d="M32 12l-11 15h6l-9 12h7l-9 11h32l-9-11h7l-9-12h6z" fill="#1F8A4C"/>' +
+            '<rect x="29" y="50" width="6" height="5" rx="1" fill="#8A5A2B"/>' +
+            '<path d="M32 6l1.8 3.7 4 .6-2.9 2.8.7 4L32 15.2l-3.6 1.9.7-4-2.9-2.8 4-.6z" fill="#E8C35A"/>' +
+            '<circle cx="27" cy="31" r="2.2" fill="#D3263A"/><circle cx="37" cy="36" r="2.2" fill="#E8C35A"/>' +
+            '<circle cx="24" cy="44" r="2.2" fill="#2F64C8"/><circle cx="34" cy="46" r="2.2" fill="#D3263A"/><circle cx="42" cy="44" r="2.2" fill="#E8C35A"/>'
+        },
+        halloween: {
+          when: function(y) { return [[D(y, 10, 27), D(y, 10, 31)]]; },
+          quip: 'Bubák si dává oběd taky.',
+          line: 'Děsivě otevírám lebky i Luncher PE…',
+          c: ['radial-gradient(circle at 82% 14%, #FFF1C2 0 34px, rgba(255,214,120,.35) 36px, transparent 120px), #1B1026',
+              '#F3D9B1', '#F27B1C', '#F27B1C', 'rgba(242,123,28,.2)', 'rgba(242,123,28,.45)', ''],
+          decor: { type: 'fly', n: 5, chars: ['🦇'], dur: [4, 7], size: [22, 22], top: [8, 40] },
+          svg: '<rect width="64" height="64" rx="16" fill="#2A1236"/>' +
+            '<path d="M32 15c0-4 2-6 5-7" stroke="#6E9A38" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
+            '<ellipse cx="22" cy="36" rx="12" ry="13" fill="#D9620F"/><ellipse cx="42" cy="36" rx="12" ry="13" fill="#D9620F"/>' +
+            '<ellipse cx="32" cy="36" rx="12" ry="14" fill="#F27B1C"/>' +
+            '<path d="M22 31l5-5 3 5zM42 31l-5-5-3 5z" fill="#FFD54A"/>' +
+            '<path d="M21 40q11 9 22 0l-3 1-2 3-3-2-3 2-3-2-3 2-2-3z" fill="#FFD54A"/>'
+        },
         velikonoce: {
+          // Úterý před Velkým pátkem až Velikonoční pondělí
+          when: function(y) { var e = easterSunday(y); return [[add(e, -5), add(e, 1)]]; },
           quip: 'Vajíčka jsou natvrdo, oběd naměkko.',
           line: 'Pletu pomlázku a Luncher PE…',
-          decor: { n: 7, chars: ['🌼', '🌷', '🌸'], dur: [7, 12], size: [14, 20] },
+          c: ['linear-gradient(#F6FBEF, #E6F2D8)', '#4F6B3A', '#3E6B22', '#7CB342', 'rgba(124,179,66,.2)', 'rgba(124,179,66,.35)', ''],
+          decor: { type: 'fall', n: 7, chars: ['🌼', '🌷', '🌸'], dur: [7, 12], size: [14, 20] },
           svg: '<rect width="64" height="64" rx="16" fill="#CDE7B0"/>' +
             '<ellipse cx="32" cy="34" rx="15" ry="19" fill="#F7A8C4"/>' +
             '<path d="M17.5 30l5-4 5 4 4.5-4 4.5 4 5-4 5 4" stroke="#fff" stroke-width="2.4" fill="none" stroke-linejoin="round"/>' +
             '<path d="M17.3 39h29.4" stroke="#7E57C2" stroke-width="3"/>' +
             '<circle cx="25" cy="46" r="1.8" fill="#fff"/><circle cx="32" cy="48" r="1.8" fill="#fff"/><circle cx="39" cy="46" r="1.8" fill="#fff"/>'
+        },
+        masopust: {
+          // Masopustní neděle až úterý (47 dní před Velikonocemi)
+          when: function(y) { var e = easterSunday(y); return [[add(e, -49), add(e, -47)]]; },
+          quip: 'Koblihy se dneska nepočítají.',
+          line: 'Pod maskou otevírám Luncher PE…',
+          c: ['linear-gradient(#1B1028, #2C1A40)', '#F3D6E6', '#FF8FC0', '#FF5FA2', 'rgba(255,95,162,.2)', 'rgba(255,95,162,.45)', ''],
+          decor: { type: 'fall', n: 16, chars: ['▪', '●', '▲'], colors: ['#FF5FA2', '#FFC93C', '#5CD68A', '#4DA3FF'], dur: [4, 8], size: [8, 12] },
+          svg: tile('#3E2856', '🎭')
+        },
+        mikulas: {
+          when: function(y) { return day(D(y, 12, 5), 1); },
+          quip: 'Byl jsi hodný? Tak na oběd.',
+          line: 'Andělsky otevírám Luncher PE…',
+          c: ['linear-gradient(#0E1326, #1A2140)', '#E3E6F5', '#E8C873', '#C62F3A', 'rgba(232,200,115,.2)', 'rgba(232,200,115,.4)', ''],
+          decor: { type: 'fall', n: 10, chars: ['⭐', '🍬', '🍊'], dur: [6, 10], size: [12, 18] },
+          svg: tile('#283055', '😇')
+        },
+        martin: {
+          when: function(y) { return day(D(y, 11, 11), 1); },
+          quip: 'Husa, zelí a knedlík.',
+          line: 'Na bílém koni vezu Luncher PE…',
+          c: ['linear-gradient(#F3F5F7, #E4E9EE)', '#4A4036', '#6E3F16', '#9A5B24', 'rgba(154,91,36,.2)', 'rgba(154,91,36,.35)', '#9AB0C4'],
+          decor: { type: 'fall', n: 16, chars: ['❄', '•'], dur: [6, 11], size: [8, 14] },
+          svg: tile('#DEE3E8', '🐎')
+        },
+        valentyn: {
+          when: function(y) { return day(D(y, 2, 14), 1); },
+          quip: 'Láska prochází žaludkem.',
+          line: 'Zamilovaně otevírám Luncher PE…',
+          c: ['linear-gradient(#FFF4F7, #FFE3EC)', '#7A3A52', '#D63A70', '#D63A70', 'rgba(214,58,112,.2)', 'rgba(214,58,112,.35)', ''],
+          decor: { type: 'rise', n: 10, chars: ['❤️', '💕', '💗'], dur: [6, 10], size: [14, 22] },
+          svg: tile('#F5D2DE', '💘')
+        },
+        pi: {
+          when: function(y) { return day(D(y, 3, 14), 0); },
+          quip: '3,14159… a pořád mám hlad.',
+          line: 'Iracionálně otevírám Luncher PE…',
+          c: ['#F7F9FC', '#3A4A63', '#2B5FB8', '#2B5FB8', 'rgba(43,95,184,.15)', 'rgba(43,95,184,.3)', '#8FA8D6'],
+          decor: { type: 'fall', n: 14, chars: ['3', '1', '4', '1', '5', '9', '2', '6'], dur: [6, 11], size: [12, 18] },
+          svg: tileText('#2B5FB8', '#FFFFFF', 'π', 38)
+        },
+        april: {
+          when: function(y) { return day(D(y, 4, 1), 0); },
+          quip: 'Dneska se obědvá zadarmo.',
+          line: 'Apríl! Otevírám Luncher PE…',
+          flip: true,
+          c: ['#FFFBEA', '#5A4A2A', '#C2306E', '#6B2D8B', 'rgba(107,45,139,.15)', 'rgba(107,45,139,.3)', '#C9B37A'],
+          decor: { type: 'fall', n: 10, chars: ['?', '!', '?'], dur: [6, 10], size: [16, 24] },
+          svg: tile('#F0EAF5', '🤡')
+        },
+        starwars: {
+          when: function(y) { return day(D(y, 5, 4), 0); },
+          quip: 'May the fork be with you.',
+          line: 'Hyperprostorem letí Luncher PE…',
+          c: ['#05060D', '#D8DCE8', '#FFE81F', '#4DA3FF', 'rgba(77,163,255,.2)', 'rgba(77,163,255,.5)', '#FFFFFF'],
+          decor: { type: 'twinkle', n: 30, dur: [1.5, 3.5] },
+          svg: '<rect width="64" height="64" rx="16" fill="#0E1120"/>' +
+            '<path d="M18 46L44 20" stroke="#4DA3FF" stroke-width="6" stroke-linecap="round" opacity=".45"/>' +
+            '<path d="M18 46L44 20" stroke="#E6F2FF" stroke-width="2.6" stroke-linecap="round"/>' +
+            '<path d="M14 50l5-5" stroke="#9AA3AD" stroke-width="5" stroke-linecap="round"/>'
+        },
+        matky: {
+          // Druhá neděle v květnu, od pátku
+          when: function(y) { return day(nth(y, 5, 0, 2), 2); },
+          quip: 'Mámy, dneska nevaříte!',
+          line: 'S kytičkou otevírám Luncher PE…',
+          c: ['linear-gradient(#FBF5FB, #F3E3F0)', '#5A3A54', '#B5479A', '#B5479A', 'rgba(181,71,154,.15)', 'rgba(181,71,154,.3)', ''],
+          decor: { type: 'fall', n: 8, chars: ['🌷', '🌸', '💐'], dur: [7, 12], size: [14, 20] },
+          svg: tile('#EBD3E6', '💐')
+        },
+        rucnik: {
+          when: function(y) { return day(D(y, 5, 25), 0); },
+          quip: 'Hlavně nepanikařit.',
+          line: 'Ručník mám, otevírám Luncher PE…',
+          c: ['linear-gradient(#F3F7FF, #E2EBFF)', '#2E3A5C', '#3A5FCD', '#3A5FCD', 'rgba(58,95,205,.15)', 'rgba(58,95,205,.3)', ''],
+          decor: { type: 'fly', n: 4, chars: ['🐬'], dur: [6, 9], size: [20, 20], top: [10, 80] },
+          svg: tileText('#3A5FCD', '#FFFFFF', '42', 30)
+        },
+        deti: {
+          when: function(y) { return day(D(y, 6, 1), 0); },
+          quip: 'Dneska bez povinné polévky.',
+          line: 'Hravě otevírám Luncher PE…',
+          c: ['linear-gradient(#EFF7FF, #DCEEFF)', '#2E4560', '#2F7BEB', '#2F7BEB', 'rgba(47,123,235,.15)', 'rgba(47,123,235,.3)', ''],
+          decor: { type: 'rise', n: 9, chars: ['🎈'], dur: [6, 10], size: [20, 28] },
+          svg: tile('#D4E6FA', '🪁')
+        },
+        otcove: {
+          // Třetí neděle v červnu, od pátku
+          when: function(y) { return day(nth(y, 6, 0, 3), 2); },
+          quip: 'Táta ví, kde se dobře vaří.',
+          line: 'Otcovsky otevírám Luncher PE…',
+          c: ['linear-gradient(#F2F7FB, #E0ECF6)', '#2E4256', '#1F5F99', '#1F5F99', 'rgba(31,95,153,.15)', 'rgba(31,95,153,.3)', ''],
+          decor: { type: 'fall', n: 7, chars: ['👔', '🔧', '⚽'], dur: [7, 12], size: [14, 20] },
+          svg: tile('#D3E2EF', '👨‍🍳')
+        },
+        prazdniny: {
+          when: function(y) { return [[D(y, 6, 29), D(y, 7, 3)]]; },
+          quip: 'Léto, zmrzlina, oběd.',
+          line: 'Prázdninově otevírám Luncher PE…',
+          c: ['linear-gradient(#FFF9EC, #FFEBC2)', '#5A4420', '#F07C12', '#F07C12', 'rgba(240,124,18,.15)', 'rgba(240,124,18,.3)', ''],
+          decor: { type: 'fall', n: 8, chars: ['🍦', '🌴', '☀️'], dur: [7, 12], size: [16, 22] },
+          svg: tile('#F6E2B8', '🏖️')
+        },
+        cokolada: {
+          when: function(y) { return day(D(y, 7, 7), 0); },
+          quip: 'Dezert dneska jako hlavní chod.',
+          line: 'Mlsně otevírám Luncher PE…',
+          c: ['linear-gradient(#FFF8F0, #F3E2CF)', '#4A3020', '#7B4A2A', '#7B4A2A', 'rgba(123,74,42,.15)', 'rgba(123,74,42,.35)', ''],
+          decor: { type: 'fall', n: 8, chars: ['🍫'], dur: [7, 12], size: [16, 22] },
+          svg: tile('#EEDDCB', '🍫')
+        },
+        sysadmin: {
+          // Poslední pátek v červenci
+          when: function(y) { return day(last(y, 7, 5), 0); },
+          quip: 'Zkusil jsi to vypnout a zapnout?',
+          line: 'sudo otevírám Luncher PE…',
+          c: ['#0B1A1C', '#BFE3E6', '#3FD0DA', '#2A9AA4', 'rgba(42,154,164,.2)', 'rgba(63,208,218,.4)', '#2A9AA4'],
+          decor: { type: 'fall', n: 18, chars: ['0', '1'], dur: [4, 8], size: [12, 16] },
+          svg: tileText('#08565D', '#3FD0DA', '&gt;_', 26)
+        },
+        orgasmus: {
+          when: function(y) { return day(D(y, 8, 8), 0); },
+          quip: 'Dneska jen samé vrcholy.',
+          line: 'Rozkošně otevírám Luncher PE…',
+          c: ['linear-gradient(#FFF5F1, #FFE1D8)', '#5A3430', '#E8456A', '#E8456A', 'rgba(232,69,106,.15)', 'rgba(232,69,106,.3)', '#F27A92'],
+          decor: { type: 'twinkle', n: 18, dur: [1.4, 3] },
+          svg: tile('#F8D5CB', '🍑')
+        },
+        programatori: {
+          // 256. den roku (13. 9., v přestupném roce 12. 9.)
+          when: function(y) { return day(D(y, 1, 256), 0); },
+          quip: 'Den 256. Konečně kulaté číslo.',
+          line: 'Kompiluji Luncher PE…',
+          c: ['#0D1117', '#C9D1D9', '#3FB950', '#1F8A4C', 'rgba(63,185,80,.2)', 'rgba(63,185,80,.4)', '#3FB950'],
+          decor: { type: 'fall', n: 16, chars: ['{', '}', '<', '/', '>', ';'], dur: [5, 9], size: [12, 18] },
+          svg: tileText('#161B22', '#3FB950', '&lt;/&gt;', 20)
+        },
+        kava: {
+          when: function(y) { return day(D(y, 10, 1), 0); },
+          quip: 'Nejdřív kafe, pak oběd.',
+          line: 'Překapávám Luncher PE…',
+          c: ['linear-gradient(#1A1310, #2C201A)', '#E8D5C0', '#D9A066', '#A8703A', 'rgba(217,160,102,.2)', 'rgba(217,160,102,.4)', ''],
+          decor: { type: 'fall', n: 10, chars: ['☕', '🫘'], dur: [6, 10], size: [14, 20] },
+          svg: tile('#3E2E24', '☕')
+        },
+        usmev: {
+          // První pátek v říjnu
+          when: function(y) { return day(nth(y, 10, 5, 1), 0); },
+          quip: 'Úsměv, oběd se blíží.',
+          line: 'S úsměvem otevírám Luncher PE…',
+          c: ['linear-gradient(#FFFBEA, #FFF0B8)', '#5A4410', '#A87600', '#E2A400', 'rgba(226,164,0,.15)', 'rgba(226,164,0,.35)', ''],
+          decor: { type: 'fall', n: 9, chars: ['😊', '🙂', '😄'], dur: [7, 12], size: [16, 22] },
+          svg: tile('#F5E6A8', '😄')
+        },
+        zmenacasu: {
+          // Poslední neděle v říjnu, od pátku
+          when: function(y) { return day(last(y, 10, 0), 2); },
+          quip: 'Hodina spánku navíc, hlad stejný.',
+          line: 'Ospale otevírám Luncher PE…',
+          c: ['linear-gradient(#101425, #1B2140)', '#D5DCF2', '#8FB8FF', '#5A7BD8', 'rgba(143,184,255,.2)', 'rgba(143,184,255,.4)', ''],
+          decor: { type: 'fall', n: 8, chars: ['🕐', '💤'], dur: [7, 12], size: [14, 20] },
+          svg: tile('#283055', '⏰')
+        },
+        patek13: {
+          // Každý pátek 13., nejnižší priorita
+          when: function(y) {
+            var out = [];
+            for (var m = 1; m <= 12; m++) { var d = D(y, m, 13); if (d.getDay() === 5) out.push([d, d]); }
+            return out;
+          },
+          quip: 'Pátek 13.? Oběd to nezakleje.',
+          line: 'Pověrčivě otevírám Luncher PE…',
+          c: ['linear-gradient(#141218, #24202C)', '#D8D2E0', '#B8A6D8', '#7E5DB8', 'rgba(126,93,184,.2)', 'rgba(126,93,184,.4)', ''],
+          decor: { type: 'fly', n: 2, chars: ['🐈‍⬛'], dur: [7, 10], size: [26, 26], top: [70, 88] },
+          svg: tile('#B8A6D8', '🐈‍⬛')
         }
       };
 
-      function easterSunday(y) {
-        var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,
-            f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
-            i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
-            mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
-        return new Date(y, mo - 1, da);
+      var ORDER = ['novyrok', 'vanoce', 'halloween', 'april', 'valentyn', 'velikonoce', 'masopust', 'mikulas', 'martin',
+                   'pi', 'starwars', 'matky', 'rucnik', 'deti', 'otcove', 'prazdniny', 'cokolada', 'sysadmin', 'orgasmus',
+                   'programatori', 'kava', 'usmev', 'zmenacasu', 'patek13'];
+      /** Všechny motivy, jejichž termín zahrnuje daný den */
+      function seasonsFor(now) {
+        var t = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(), out = [];
+        ORDER.forEach(function(id) {
+          var w = THEMES[id].when(now.getFullYear());
+          for (var i = 0; i < w.length; i++) if (t >= w[i][0].getTime() && t <= w[i][1].getTime()) { out.push(id); break; }
+        });
+        return out;
       }
+      // Překryv termínů (Apríl ve velikonočním týdnu, Halloween a změna času,
+      // Pátek 13. u Valentýna…) se řeší náhodou: při každém otevření se vybere
+      // jeden z motivů, které na dnešek připadají.
       function seasonFor(now) {
-        var md = (now.getMonth() + 1) * 100 + now.getDate();
-        if (md >= 1027 && md <= 1031) return 'halloween';
-        if (md >= 1214 && md <= 1226) return 'vanoce';
-        if (md >= 1230 || md <= 105) return 'novyrok';
-        // Velikonoce: úterý před Velkým pátkem až Velikonoční pondělí
-        var e = easterSunday(now.getFullYear()), day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        var diff = Math.round((day - e) / 86400000);
-        if (diff >= -5 && diff <= 1) return 'velikonoce';
-        return '';
+        var all = seasonsFor(now);
+        return all.length ? all[Math.floor(Math.random() * all.length)] : '';
       }
 
-      var forced = /(?:^#|&)season=([a-z]+)/.exec(window.location.hash);
+      var forced = /(?:^#|&)season=([a-z0-9]+)/.exec(window.location.hash);
       var id = forced ? forced[1] : seasonFor(new Date());
-      var t = THEMES[id];
+      var t = THEMES.hasOwnProperty(id) ? THEMES[id] : null;
       if (!t) return;
 
       loadingEl.setAttribute('data-season', id);
+      ['bg', 'text', 'quip', 'bar', 'track', 'glow', 'decor'].forEach(function(k, i) {
+        if (t.c[i]) loadingEl.style.setProperty('--s-' + k, t.c[i]);
+      });
+      if (t.flip) loadingEl.classList.add('season-flip');
       loadingEl.querySelector('.wrapper-loading-icon svg').innerHTML = t.svg;
       // Dva řádky: vtip motivu + vlastní varianta „Otevírám Luncher PE…"
       var textEl = loadingEl.querySelector('.wrapper-loading-text'), quipEl = document.createElement('div');
@@ -483,17 +679,19 @@
 
       function rnd(r) { return r[0] + Math.random() * (r[1] - r[0]); }
       var decor = loadingEl.querySelector('.season-decor'), dc = t.decor, html = '';
+      decor.className = 'season-decor d-' + dc.type;
       for (var n = 0; n < dc.n; n++) {
         // Záporný delay = animace běží už od prvního snímku, ne až za chvíli
         var dur = rnd(dc.dur), st = 'animation-duration:' + dur.toFixed(1) + 's;animation-delay:-' + (Math.random() * dur).toFixed(1) + 's;';
-        if (dc.twinkle) {
+        if (dc.type === 'twinkle') {
           st += 'left:' + rnd([4, 96]).toFixed(1) + '%;top:' + rnd([4, 96]).toFixed(1) + '%;';
           html += '<i style="' + st + '"></i>';
           continue;
         }
-        if (dc.top) st += 'top:' + rnd(dc.top).toFixed(1) + '%;';
-        else st += 'left:' + rnd([0, 98]).toFixed(1) + '%;--drift:' + rnd([-40, 40]).toFixed(0) + 'px;';
+        if (dc.type === 'fly') st += 'top:' + rnd(dc.top).toFixed(1) + '%;';
+        else st += 'left:' + rnd([0, 96]).toFixed(1) + '%;--drift:' + rnd([-40, 40]).toFixed(0) + 'px;';
         if (dc.size) st += 'font-size:' + rnd(dc.size).toFixed(0) + 'px;';
+        if (dc.colors) st += 'color:' + dc.colors[n % dc.colors.length] + ';';
         html += '<i style="' + st + '">' + dc.chars[n % dc.chars.length] + '</i>';
       }
       decor.innerHTML = html;
