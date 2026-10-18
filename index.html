@@ -331,13 +331,21 @@
     });
 
     // Fallback: pokud handshake nedorazí do 4 s (typicky GAS load 1-3 s),
-    // ukáže panel s vysvětlením + CTA. Force fade-out po 10 s je ODSTRANĚN
-    // (původní chování): když user není přihlášen Google, iframe ukazuje
-    // Google error a wrapper předtím prostě zmizel. Teď ho necháme viset
-    // s naší zprávou.
+    // ukáže panel s vysvětlením + CTA.
     setTimeout(function() {
       if (!faded) fallbackEl.classList.add('show');
     }, 4000);
+
+    // Luncher PE GAS appka handshake neposílá, takže overlay musí zmizet
+    // i bez něj. iframe 'load' pálí až po načtení obsahu (vč. vnořeného
+    // GAS sandbox iframu) → krátká rezerva a fade-out. Pojistka 10 s pro
+    // případ, že load nedorazí. Bez toho overlay visel napořád nad funkční
+    // appkou (regrese z aaa252f, kde se force fade-out smazal).
+    iframeEl.addEventListener('load', function() {
+      if (iframeEl.src.indexOf('script.google.com') === -1) return;
+      setTimeout(fadeOut, 800);
+    });
+    setTimeout(fadeOut, 10000);
 
     // Reload button: user může zkusit znovu (např. po přihlášení v jiném tabu).
     var reloadBtn = document.getElementById('fallback-reload');
